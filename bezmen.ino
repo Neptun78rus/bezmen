@@ -5,7 +5,7 @@
 #include <LiquidCrystal.h> // Подключаем библиотеку работы с символьными дисплеями
 LiquidCrystal lcd(8, 3, 4, 5, 6, 7); // (RS, E, D4, D5, D6, D7) подключаем выходы дисплея согласно последовательнос
 HX711 scale;
-float scale_calibration = -1.5456;// значение калибровочного коэффициента (делать подбор для своих весов)
+float scale_calibration = -15919;// значение калибровочного коэффициента (делать подбор для своих весов)
 float weight_units;// переменные вес в унциях
 float weight_gr;//вес в граммах
 
@@ -26,9 +26,9 @@ void DRIG() {
 void setup() {
 	lcd.begin(16, 2); // Инициализируем LCD 1602
 	attachInterrupt(digitalPinToInterrupt(fqPin), DRIG, RISING);// Подключаем функцию на прерывание по появлению сигнала на ноге fqPin.
-	lcd.print("calibration");
+	lcd.print("***** TGE *****");
 	scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
-	delay (5000);
+	delay (1000);
 	scale.set_scale();
 	scale.tare(); // Сбрасываем весы на 0
 }
@@ -50,12 +50,15 @@ void loop() {
 		rpm = 0;
 	}
 	lcd.print( rpm*60 );
-	lcd.write("rpm");
+	lcd.write(" rpm");
 	scale.set_scale(scale_calibration);// Устанавливаем калибровочный коэффициент
-	weight_units = scale.get_units(), 50;// получить данные
-	weight_gr = weight_units * 0.035274;// перевод из унций в граммы
+	weight_units = scale.get_units(),50;// получить данные
+	weight_gr = weight_units * 0.521556735;// перевод из унций в граммы
 	lcd.setCursor(0,1);
 	lcd.print(weight_gr);
-	lcd.write(" gr");
+	lcd.write(" NM");
+	lcd.setCursor(10,1);
+	lcd.print (rpm*60*weight_gr/9550,0);
+	lcd.write("kW");
 	delay(1000);
 }
